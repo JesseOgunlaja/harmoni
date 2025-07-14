@@ -1,42 +1,46 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --accent-color: #1762af;
 }
 
 * {
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
-  color: inherit;
   text-decoration: none;
+  color: #222;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+input,
+textarea,
+option,
+select,
+button {
+  font-family: Poppins, Poppins Fallback;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+option:focus {
+  outline: none;
+}
+
+body {
+  color: #222;
+  height: 100vh;
+  font-family: Poppins, Poppins Fallback;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.screen:not(:has(article > svg)) footer {
+  background: rgb(244, 244, 245);
 }

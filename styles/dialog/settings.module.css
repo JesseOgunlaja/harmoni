@@ -1,0 +1,36 @@
+#dialog {
+  > div {
+    form {
+      p {
+        display: flex;
+        align-items: center;
+        color: rgba(0, 0, 0, 0.7);
+        font-size: 14px;
+        margin-left: 2px;
+        gap: 4px;
+
+        svg {
+          height: 21px;
+          width: 21px;
+        }
+      }
+
+      div:last-of-type {
+        margin-top: 25px;
+        display: flex;
+        gap: 10px;
+
+        button:first-child {
+          color: white;
+          background: red;
+          margin-right: auto;
+          font-weight: 600;
+        }
+        button:last-child {
+          color: white;
+          background: var(--accent-color);
+        }
+      }
+    }
+  }
+}

@@ -1,95 +1,55 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import styles from "@/styles/home.module.css";
+import { ArrowRight, Focus, Target, Zap } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+    <main id={styles.main}>
+      <section>
+        <h1 id={styles.slogan}>
+          Cut the clutter, <br /> Boost the output
+        </h1>
+        <p id={styles.description}>
+          A sleek, intuitive tool crafted to simplify your workflow, eliminate
+          distractions, and maximize your productivity every step of the way.
+        </p>
+        <Link id={styles.getStarted} href="/signin">
+          Get started now <ArrowRight />
+        </Link>
+        <p>Free Forever and no credit card required.</p>
+      </section>
+      <section>
+        <h2>Built for focus</h2>
+        <p>
+          Every feature designed to help you stay in the zone and get more done.
+        </p>
+        <div>
+          <article>
+            <Focus />
+            <p>Distraction free</p>
+            <p>
+              Clean interface that eliminates visual noise and keeps you focused
+              on what matters most.
+            </p>
+          </article>
+          <article>
+            <Zap />
+            <p>Lightning Fast</p>
+            <p>
+              Optimized for speed with instant loading and seamless interactions
+              across all browsers
+            </p>
+          </article>
+          <article>
+            <Target />
+            <p>Goal Oriented</p>
+            <p>
+              Smart workflows that adapt to your goals and help you achieve them
+              more efficiently.
+            </p>
+          </article>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+    </main>
   );
 }

@@ -1,0 +1,43 @@
+table {
+  font-size: 13px;
+  border-spacing: 0;
+  overflow: hidden;
+  border-collapse: separate;
+  border-radius: 10px;
+  width: 100%;
+  border: 1.5px solid rgba(0, 0, 0, 0.13);
+
+  thead {
+    color: white;
+    background-color: var(--accent-color);
+
+    tr th {
+      text-align: left;
+      padding: 12px;
+      font-weight: 500;
+    }
+  }
+
+  tbody {
+    tr:not(:last-of-type) td {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+    }
+
+    td {
+      white-space: nowrap;
+      font-weight: 400;
+      text-overflow: ellipsis;
+      position: relative;
+      overflow: hidden;
+      padding: 12px;
+
+      :first-child {
+        max-width: 150px;
+      }
+
+      :nth-child(2) {
+        max-width: 225px;
+      }
+    }
+  }
+}

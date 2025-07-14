@@ -1,0 +1,93 @@
+#dialog {
+  > div {
+    form {
+      margin-top: 20px;
+
+      div:first-of-type {
+        position: relative;
+
+        select {
+          appearance: none;
+          cursor: pointer;
+          width: 100%;
+        }
+
+        svg {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          stroke-width: 2.5px;
+          pointer-events: none;
+          color: rgba(0, 0, 0, 0.7);
+        }
+      }
+
+      button:first-of-type:not(:first-child) {
+        background: var(--status-color);
+        color: white;
+        margin-bottom: 10px;
+      }
+
+      button:last-child {
+        color: white;
+        background: var(--status-color);
+      }
+
+      div:last-of-type {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+
+        button:first-child {
+          margin-right: auto;
+          background: red;
+          color: white;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+#dialog table {
+  margin-top: 10px;
+
+  tbody {
+    tr {
+      td {
+        &:last-child {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          & > button {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+
+            &:disabled svg {
+              opacity: 0.3;
+              cursor: not-allowed;
+            }
+
+            &:hover:not(:disabled) svg {
+              background: #f0f5f9;
+              color: #2d3748;
+            }
+
+            svg {
+              padding: 5px;
+              box-sizing: content-box;
+              border-radius: 8px;
+              fill: rgba(0, 0, 0, 0.7);
+              color: #718096;
+              stroke-width: 1.25px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

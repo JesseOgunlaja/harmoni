@@ -1,0 +1,70 @@
+#main {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: auto 0;
+  transform: translateY(3vh);
+}
+
+#main div:has(svg) {
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 3px 6px -2px,
+    rgba(0, 0, 0, 0.043) 0px 1px 1px;
+}
+
+#main svg {
+  height: 70px;
+  width: 70px;
+  padding: 15px;
+}
+
+#main h1 {
+  font-size: 19px;
+  margin: 20px 0px;
+  text-align: center;
+  font-weight: 500;
+}
+
+#main form {
+  width: 288px;
+  display: flex;
+  flex-direction: column;
+}
+
+#main form > *:not(label) {
+  width: 100%;
+  padding: 12.5px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  border: 0.1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 3px 6px -2px,
+    rgba(0, 0, 0, 0.043) 0px 1px 1px;
+}
+
+#main form label {
+  font-size: 13.5px;
+  margin-bottom: 5px;
+}
+
+#main form button {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  color: white;
+  background: var(--accent-color) !important;
+
+  &:hover {
+    background-color: rgb(248, 248, 248);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    color: black;
+  }
+}

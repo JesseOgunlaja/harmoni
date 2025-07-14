@@ -1,0 +1,19 @@
+#dialog {
+  > div {
+    form {
+      margin-top: 20px;
+
+      div:last-of-type {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        button:last-child {
+          color: white;
+          background: var(--status-color);
+        }
+      }
+    }
+  }
+}
