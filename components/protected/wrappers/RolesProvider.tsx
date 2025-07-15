@@ -20,7 +20,7 @@ const RolesContext = createContext<{
 export const useRoles = () => useContext(RolesContext);
 
 export default function RolesProvider({ roles, children }: PropsType) {
-  const [optimisticRoles, changeProjectStatus] = useOptimistic(
+  const [optimisticRoles, changeOptimisticProjectStatus] = useOptimistic(
     roles,
     (currentRoles, { projectId, newStatus }: UpdateData) => {
       return currentRoles.map((role) =>
@@ -35,7 +35,7 @@ export default function RolesProvider({ roles, children }: PropsType) {
     <RolesContext.Provider
       value={{
         roles: optimisticRoles,
-        changeOptimisticProjectStatus: changeProjectStatus,
+        changeOptimisticProjectStatus,
       }}
     >
       {children}
