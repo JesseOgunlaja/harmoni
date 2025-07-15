@@ -1,6 +1,7 @@
 import EmailChangeNotifier from "@/components/protected/EmailChangeNotifier";
 import ProjectList from "@/components/protected/projects/ProjectList";
 import DndProvider from "@/components/protected/wrappers/DndContext";
+import RolesProvider from "@/components/protected/wrappers/RolesProvider";
 import UserProvider from "@/components/protected/wrappers/UserProvider";
 import { getUserFromId } from "@/server/lib";
 import styles from "@/styles/dashboard.module.css";
@@ -16,29 +17,13 @@ export default async function Page() {
       <EmailChangeNotifier />
       <div className={styles.projects}>
         <UserProvider user={user}>
-          <DndProvider roles={user!.roles}>
-            <ProjectList
-              title="Scheduled"
-              roles={user!.roles.filter(
-                ({ project }) => project.status === "scheduled"
-              )}
-              status="scheduled"
-            />
-            <ProjectList
-              title="In Progress"
-              roles={user!.roles.filter(
-                ({ project }) => project.status === "ongoing"
-              )}
-              status="ongoing"
-            />
-            <ProjectList
-              title="Completed"
-              roles={user!.roles.filter(
-                ({ project }) => project.status === "complete"
-              )}
-              status="complete"
-            />
-          </DndProvider>
+          <RolesProvider roles={user.roles}>
+            <DndProvider>
+              <ProjectList title="Scheduled" status="scheduled" />
+              <ProjectList title="In Progress" status="ongoing" />
+              <ProjectList title="Completed" status="complete" />
+            </DndProvider>
+          </RolesProvider>
         </UserProvider>
       </div>
     </main>

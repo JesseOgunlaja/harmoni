@@ -13,12 +13,12 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useRouter } from "next/navigation";
-import { ReactNode, useState } from "react";
+import { ReactNode, startTransition, useState } from "react";
 import Project from "../projects/Project";
+import { useRoles } from "./RolesProvider";
 
 interface PropsType {
   children: ReactNode;
-  roles: FullRole[];
 }
 
 interface DragEvent {
@@ -40,8 +40,9 @@ class CustomMouseSensor extends MouseSensor {
   ];
 }
 
-export default function DndProvider({ children, roles }: PropsType) {
+export default function DndProvider({ children }: PropsType) {
   const router = useRouter();
+  const { roles, changeOptimisticProjectStatus } = useRoles()!;
   const [activeRole, setActiveProject] = useState<FullRole>();
   const mouseSensor = useSensor(CustomMouseSensor, {
     activationConstraint: {
@@ -71,7 +72,11 @@ export default function DndProvider({ children, roles }: PropsType) {
         },
       },
     } = event as DragEvent;
+
     if (oldStatus === newStatus) return;
+    startTransition(() => {
+      changeOptimisticProjectStatus({ projectId, newStatus });
+    });
 
     promiseToast(
       new Promise((resolve, reject) => {
