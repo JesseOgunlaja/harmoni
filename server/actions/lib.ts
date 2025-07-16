@@ -14,12 +14,12 @@ export const transporter = createTransport({
 export async function sendEmail<
   T extends (_props: ComponentProps<T>) => JSX.Element
 >(to: string, subject: string, component: T, props: ComponentProps<T>) {
-  const ReactDOMServer = (await import("react-dom/server")).default;
+  const { renderToStaticMarkup } = (await import("react-dom/server")).default;
   const mailOptions = {
     from: "Harmoni <noreply@harmoni.jesseogu.dev>",
     to,
     subject,
-    html: ReactDOMServer.renderToString(component(props)),
+    html: renderToStaticMarkup(component(props)),
   };
 
   await transporter.sendMail(mailOptions);
