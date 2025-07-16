@@ -4,6 +4,7 @@ import AuthEmailComponent from "@/components/email/AuthEmailComponent";
 import { generateRandomString } from "@/lib/lib";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { after } from "next/server";
 import {
   refreshAccessToken,
   setAccessToken,
@@ -91,8 +92,12 @@ export async function loginWithOTP(otp: number) {
 
 export async function logout() {
   const cookiesInstance = await cookies();
+  const sessionId = cookiesInstance.get("refresh_token")!.value;
   cookiesInstance.delete("access_token");
   cookiesInstance.delete("refresh_token");
+  after(async () => {
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+  });
 }
 
 export async function refreshToken() {
