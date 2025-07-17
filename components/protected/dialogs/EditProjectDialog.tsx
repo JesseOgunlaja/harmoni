@@ -8,7 +8,7 @@ import styles from "@/styles/dialog/editProject.module.css";
 import "@/styles/utils/dialog.css";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useReducer, useState } from "react";
 import { createPortal } from "react-dom";
 import ManageUsers from "../projects/ManageUsers";
 import { useRole } from "../wrappers/RoleProvider";
@@ -17,14 +17,34 @@ interface PropsType {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface State {
+  title: string;
+  description: string;
+  status: Project["status"];
+}
+
+type Action =
+  | { key: "status"; value: Project["status"] }
+  | { key: "title"; value: string }
+  | { key: "description"; value: string };
+
+function reducer(state: State, action: Action) {
+  return {
+    ...state,
+    [action.key]: action.value,
+  };
+}
+
 export default function EditProjectDialog({ setOpen }: PropsType) {
   const { project, role } = useRole()!;
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [isEditingUsers, setIsEditingUsers] = useState(false);
-  const [title, setTitle] = useState(project.title);
-  const [status, setStatus] = useState<Project["status"]>(project.status);
-  const [description, setDescription] = useState(project.description);
+  const [{ title, status, description }, dispatch] = useReducer(
+    reducer,
+    project
+  );
 
   function closeModal() {
     setLoading(false);
@@ -97,7 +117,12 @@ export default function EditProjectDialog({ setOpen }: PropsType) {
             <div>
               <select
                 id="edit-project-status"
-                onChange={(e) => setStatus(e.target.value as Project["status"])}
+                onChange={(e) =>
+                  dispatch({
+                    key: "status",
+                    value: e.target.value as Project["status"],
+                  })
+                }
                 value={status}
               >
                 <option value="scheduled">Scheduled</option>
@@ -109,7 +134,9 @@ export default function EditProjectDialog({ setOpen }: PropsType) {
             <label htmlFor="edit-project-title">Project Title</label>
             <input
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) =>
+                dispatch({ key: "title", value: e.target.value })
+              }
               autoComplete="off"
               type="text"
               id="edit-project-title"
@@ -117,7 +144,9 @@ export default function EditProjectDialog({ setOpen }: PropsType) {
             <label htmlFor="edit-project-description">Description</label>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) =>
+                dispatch({ key: "description", value: e.target.value })
+              }
               id="edit-project-description"
             ></textarea>
             {(role === "admin" || role === "owner") && (
