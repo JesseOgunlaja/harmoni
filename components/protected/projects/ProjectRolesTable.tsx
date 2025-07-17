@@ -9,6 +9,7 @@ interface PropsType {
 
 export default function ProjectRolesTable({ isEditing = true }: PropsType) {
   const role = useRole()!;
+
   return (
     <table>
       <thead>

@@ -25,11 +25,13 @@ interface PropsType {
 export default function ManageUserDropdown({ role, projectId }: PropsType) {
   const userRole = useRole()!;
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const hasPermission =
     (userRole.role === "owner" || userRole.role === "admin") &&
