@@ -1,8 +1,11 @@
 import { setAccessToken, setRefreshToken, signJWT } from "@/server/auth";
 import { db, kv } from "@/server/db/db";
 import { sessions, users } from "@/server/db/schema";
+import { env } from "@/server/env";
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { createServerStream } from "streamthing";
 
 interface ParamsType {
   params: Promise<{
@@ -44,6 +47,15 @@ export async function GET(request: NextRequest, { params }: ParamsType) {
     ]);
 
     await setAccessToken(access_token);
+
+    const stream = createServerStream({
+      id: env.NEXT_PUBLIC_WEBSOCKET_SERVER_ID,
+      region: env.NEXT_PUBLIC_WEBSOCKET_SERVER_REGION,
+      password: env.WEBSOCKET_SERVER_PASSWORD,
+      channel: (await cookies()).get("device_id")?.value as string,
+    });
+
+    stream.send("login", "");
 
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch {

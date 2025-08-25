@@ -70,7 +70,25 @@ export function promiseToast(
   });
 }
 
+export function getCookie(name: string) {
+  const cookies = document.cookie.split("; ");
+  for (const cookie of cookies) {
+    const [key, value] = cookie.split("=");
+    if (key === name) return decodeURIComponent(value);
+  }
+
+  return null;
+}
+
 export function formatRole(role: Role["role"]) {
   const formattedRole = role === "read_only" ? "viewer" : role;
   return formattedRole[0].toUpperCase() + formattedRole.slice(1);
+}
+
+export async function hashString(string: string) {
+  const data = new TextEncoder().encode(string);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }

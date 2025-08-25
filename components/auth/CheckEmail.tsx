@@ -1,8 +1,11 @@
 import { promiseToast } from "@/lib/lib";
 import { loginWithOTP } from "@/server/actions/auth";
+import { getWebsocketToken } from "@/server/actions/utils";
+import { env } from "@/server/env";
 import styles from "@/styles/signin.module.css";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { ClientStream, createClientStream } from "streamthing";
 
 interface PropsType {
   email: string;
@@ -13,6 +16,22 @@ export default function CheckEmail({ email }: PropsType) {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [isManualLogin, setIsManualLogin] = useState(false);
+
+  useEffect(() => {
+    let stream: ClientStream;
+
+    (async () => {
+      stream = createClientStream({
+        id: env.NEXT_PUBLIC_WEBSOCKET_SERVER_ID,
+        region: env.NEXT_PUBLIC_WEBSOCKET_SERVER_REGION,
+        token: await getWebsocketToken(),
+      });
+
+      stream.receive("login", () => window.location.replace("/onboarding"));
+    })();
+
+    return () => stream?.disconnect();
+  }, [email]);
 
   function formSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
