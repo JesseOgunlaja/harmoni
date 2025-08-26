@@ -55,7 +55,7 @@ export async function GET(request: NextRequest, { params }: ParamsType) {
       channel: (await cookies()).get("device_id")?.value as string,
     });
 
-    stream.send("login", "");
+    await stream.send("login", "");
 
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch {
