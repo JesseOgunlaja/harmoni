@@ -20,16 +20,15 @@ export default function CheckEmail({ email }: PropsType) {
   useEffect(() => {
     let stream: ClientStream;
 
-    (async () => {
+    getWebsocketToken().then((token) => {
       stream = createClientStream({
         id: env.NEXT_PUBLIC_WEBSOCKET_SERVER_ID,
         region: env.NEXT_PUBLIC_WEBSOCKET_SERVER_REGION,
-        token: await getWebsocketToken(),
+        token,
       });
 
       stream.receive("login", () => window.location.replace("/onboarding"));
-    })();
-
+    });
     return () => stream?.disconnect();
   }, [email]);
 
