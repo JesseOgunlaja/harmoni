@@ -1,11 +1,10 @@
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { createServerStream } from "streamthing";
+import { createWebsocketStream } from "@/server/actions/lib";
 import { setAccessToken, setRefreshToken, signJWT } from "@/server/auth";
 import { db, kv } from "@/server/db/db";
 import { sessions, users } from "@/server/db/schema";
-import { env } from "@/server/env";
 
 interface ParamsType {
 	params: Promise<{
@@ -48,11 +47,7 @@ export async function GET(request: NextRequest, { params }: ParamsType) {
 
 		await setAccessToken(access_token);
 
-		const stream = createServerStream({
-			id: env.NEXT_PUBLIC_WEBSOCKET_SERVER_ID,
-			region: env.NEXT_PUBLIC_WEBSOCKET_SERVER_REGION,
-			password: env.WEBSOCKET_SERVER_PASSWORD,
-		});
+		const stream = createWebsocketStream();
 
 		const channel = (await cookies()).get("device_id")?.value as string;
 		stream.send(channel, "login", "");

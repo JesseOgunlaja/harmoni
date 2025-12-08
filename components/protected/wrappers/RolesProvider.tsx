@@ -1,44 +1,41 @@
 "use client";
 
+import { createContext, ReactNode, useContext, useState } from "react";
+import { useRealtime } from "@/hooks/useRealtime";
 import { FullRole, Project } from "@/server/db/schema";
-import { createContext, ReactNode, useContext, useOptimistic } from "react";
 
 interface PropsType {
-  roles: FullRole[];
-  children: ReactNode;
+	roles: FullRole[];
+	children: ReactNode;
 }
 
-interface UpdateData {
-  projectId: number;
-  newStatus: Project["status"];
+export interface UpdateData {
+	projectId: number;
+	newStatus: Project["status"];
 }
 
 const RolesContext = createContext<{
-  roles: FullRole[];
-  changeOptimisticProjectStatus: (_updateData: UpdateData) => void;
+	roles: FullRole[];
+	setRoles: React.Dispatch<React.SetStateAction<FullRole[]>>;
 } | null>(null);
 export const useRoles = () => useContext(RolesContext);
 
-export default function RolesProvider({ roles, children }: PropsType) {
-  const [optimisticRoles, changeOptimisticProjectStatus] = useOptimistic(
-    roles,
-    (currentRoles, { projectId, newStatus }: UpdateData) => {
-      return currentRoles.map((role) =>
-        role.projectId === projectId
-          ? { ...role, project: { ...role.project, status: newStatus } }
-          : role
-      );
-    }
-  );
+export default function RolesProvider({
+	roles: initalRoles,
+	children,
+}: PropsType) {
+	const [roles, setRoles] = useState(initalRoles);
 
-  return (
-    <RolesContext.Provider
-      value={{
-        roles: optimisticRoles,
-        changeOptimisticProjectStatus,
-      }}
-    >
-      {children}
-    </RolesContext.Provider>
-  );
+	useRealtime(setRoles);
+
+	return (
+		<RolesContext.Provider
+			value={{
+				roles,
+				setRoles,
+			}}
+		>
+			{children}
+		</RolesContext.Provider>
+	);
 }

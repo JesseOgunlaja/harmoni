@@ -8,81 +8,110 @@ import "@/styles/utils/dialog.css";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRoles } from "../wrappers/RolesProvider";
 import { useStatus } from "../wrappers/StatusProvider";
+import { useUser } from "../wrappers/UserProvider";
 
 interface PropsType {
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function AddProjectDialog({ setOpen }: PropsType) {
-  const status = useStatus()!;
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+	const status = useStatus()!;
+	const { setRoles } = useRoles()!;
+	const user = useUser()!;
+	const router = useRouter();
+	const [loading, setLoading] = useState(false);
+	const [title, setTitle] = useState("");
+	const [description, setDescription] = useState("");
 
-  function closeModal() {
-    setTitle("");
-    setDescription("");
-    setLoading(false);
-    setOpen(false);
-  }
+	function closeModal() {
+		setTitle("");
+		setDescription("");
+		setLoading(false);
+		setOpen(false);
+	}
 
-  function formSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (loading) return;
+	function formSubmit(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		if (loading) return;
 
-    if (!validateWithSchema(projectsSchema, { title, description })) return;
+		if (!validateWithSchema(projectsSchema, { title, description })) return;
 
-    setLoading(true);
-    promiseToast(
-      new Promise((resolve, reject) => {
-        addProject(title, description, status!).then((res) => {
-          if (res.success) resolve(res.message);
-          else reject(res.message);
-        });
-      }),
-      {
-        successFunction: () => {
-          closeModal();
-          router.refresh();
-        },
-        errorFunction: () => setLoading(false),
-      }
-    );
-  }
+		setLoading(true);
+		promiseToast(
+			new Promise((resolve, reject) => {
+				addProject(title, description, status!).then((res) => {
+					if (res.success) {
+						resolve(res.message);
+						setRoles((currentRoles) => [
+							...currentRoles,
+							{
+								projectId: res.projectId,
+								role: "owner",
+								userId: user.id,
+								project: {
+									comments: [],
+									createdAt: new Date(),
+									roles: [
+										{
+											projectId: res.projectId,
+											role: "owner",
+											userId: user.id,
+											user,
+										},
+									],
+									id: res.projectId,
+									title,
+									status,
+									description,
+								},
+							},
+						]);
+					} else reject(res.message);
+				});
+			}),
+			{
+				successFunction: () => {
+					closeModal();
+					router.refresh();
+				},
+				errorFunction: () => setLoading(false),
+			},
+		);
+	}
 
-  return createPortal(
-    <dialog id={styles.dialog} className={status} onClick={closeModal} open>
-      <div onClick={(e) => e.stopPropagation()}>
-        <div>
-          <p>Add new {status} project</p>
-          <button onClick={closeModal}>&times;</button>
-        </div>
-        <form onSubmit={formSubmit}>
-          <label htmlFor="add-project-title">Project Title</label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            autoComplete="off"
-            type="text"
-            id="add-project-title"
-          />
-          <label htmlFor="add-project-description">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            id="add-project-description"
-          ></textarea>
-          <div>
-            <button onClick={closeModal} type="button">
-              Cancel
-            </button>
-            <button type="submit">Add Project</button>
-          </div>
-        </form>
-      </div>
-    </dialog>,
-    document.body
-  );
+	return createPortal(
+		<dialog id={styles.dialog} className={status} onClick={closeModal} open>
+			<div onClick={(e) => e.stopPropagation()}>
+				<div>
+					<p>Add new {status} project</p>
+					<button onClick={closeModal}>&times;</button>
+				</div>
+				<form onSubmit={formSubmit}>
+					<label htmlFor="add-project-title">Project Title</label>
+					<input
+						value={title}
+						onChange={(e) => setTitle(e.target.value)}
+						autoComplete="off"
+						type="text"
+						id="add-project-title"
+					/>
+					<label htmlFor="add-project-description">Description</label>
+					<textarea
+						value={description}
+						onChange={(e) => setDescription(e.target.value)}
+						id="add-project-description"
+					></textarea>
+					<div>
+						<button onClick={closeModal} type="button">
+							Cancel
+						</button>
+						<button type="submit">Add Project</button>
+					</div>
+				</form>
+			</div>
+		</dialog>,
+		document.body,
+	);
 }

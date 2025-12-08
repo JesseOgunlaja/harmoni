@@ -1,112 +1,116 @@
 "use client";
 
+import {
+	DndContext,
+	DragOverlay,
+	MouseSensor,
+	TouchSensor,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core";
+import { useRouter } from "next/navigation";
+import { ReactNode, useState } from "react";
 import { promiseToast } from "@/lib/lib";
 import { changeProjectStatus } from "@/server/actions/projects";
 import { FullRole, Project as ProjectType } from "@/server/db/schema";
 import styles from "@/styles/dashboard.module.css";
-import {
-  DndContext,
-  DragOverlay,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { useRouter } from "next/navigation";
-import { ReactNode, startTransition, useState } from "react";
 import Project from "../projects/Project";
 import { useRoles } from "./RolesProvider";
 
 interface PropsType {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 interface DragEvent {
-  over: { id: ProjectType["status"] };
-  active: { id: number; data: { current: { status: ProjectType["status"] } } };
+	over: { id: ProjectType["status"] };
+	active: { id: number; data: { current: { status: ProjectType["status"] } } };
 }
 
 class CustomMouseSensor extends MouseSensor {
-  static override activators = [
-    {
-      eventName: "onMouseDown",
-      handler: ({ nativeEvent }: { nativeEvent: MouseEvent }) => {
-        return !(
-          nativeEvent.target instanceof HTMLElement &&
-          nativeEvent.target.closest("dialog")
-        );
-      },
-    } as const,
-  ];
+	static override activators = [
+		{
+			eventName: "onMouseDown",
+			handler: ({ nativeEvent }: { nativeEvent: MouseEvent }) => {
+				return !(
+					nativeEvent.target instanceof HTMLElement &&
+					nativeEvent.target.closest("dialog")
+				);
+			},
+		} as const,
+	];
 }
 
 export default function DndProvider({ children }: PropsType) {
-  const router = useRouter();
-  const { roles, changeOptimisticProjectStatus } = useRoles()!;
-  const [activeRole, setActiveProject] = useState<FullRole>();
-  const mouseSensor = useSensor(CustomMouseSensor, {
-    activationConstraint: {
-      distance: 8,
-    },
-  });
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 250,
-      tolerance: 5,
-    },
-  });
-  const sensors = useSensors(mouseSensor, touchSensor);
+	const router = useRouter();
+	const { roles, setRoles } = useRoles()!;
+	const [activeRole, setActiveProject] = useState<FullRole>();
+	const mouseSensor = useSensor(CustomMouseSensor, {
+		activationConstraint: {
+			distance: 8,
+		},
+	});
+	const touchSensor = useSensor(TouchSensor, {
+		activationConstraint: {
+			delay: 250,
+			tolerance: 5,
+		},
+	});
+	const sensors = useSensors(mouseSensor, touchSensor);
 
-  function handleDragStart(event: unknown) {
-    const { active } = event as Pick<DragEvent, "active">;
-    setActiveProject(roles.find(({ project: { id } }) => id === active.id));
-  }
+	function handleDragStart(event: unknown) {
+		const { active } = event as Pick<DragEvent, "active">;
+		setActiveProject(roles.find(({ project: { id } }) => id === active.id));
+	}
 
-  function handleDragEnd(event: unknown) {
-    const {
-      over: { id: newStatus },
-      active: {
-        id: projectId,
-        data: {
-          current: { status: oldStatus },
-        },
-      },
-    } = event as DragEvent;
+	function handleDragEnd(event: unknown) {
+		const {
+			over: { id: newStatus },
+			active: {
+				id: projectId,
+				data: {
+					current: { status: oldStatus },
+				},
+			},
+		} = event as DragEvent;
 
-    if (oldStatus === newStatus) return;
-    startTransition(() => {
-      changeOptimisticProjectStatus({ projectId, newStatus });
-    });
+		if (oldStatus === newStatus) return;
+		setRoles((currentRoles) =>
+			currentRoles.map((role) =>
+				role.projectId === projectId
+					? { ...role, project: { ...role.project, status: newStatus } }
+					: role,
+			),
+		);
 
-    promiseToast(
-      new Promise((resolve, reject) => {
-        changeProjectStatus(projectId, newStatus).then((res) => {
-          if (res.success) resolve(res.message);
-          else reject(res.message);
-        });
-      }),
-      {
-        successFunction: router.refresh,
-      }
-    );
-  }
+		promiseToast(
+			new Promise((resolve, reject) => {
+				changeProjectStatus(projectId, newStatus).then((res) => {
+					if (res.success) resolve(res.message);
+					else reject(res.message);
+				});
+			}),
+			{
+				successFunction: router.refresh,
+			},
+		);
+	}
 
-  return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      {children}
-      <DragOverlay>
-        {activeRole ? (
-          <div className={styles.projectList}>
-            <div className={styles[activeRole.project.status]}>
-              <Project role={activeRole} />
-            </div>
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
-  );
+	return (
+		<DndContext
+			sensors={sensors}
+			onDragStart={handleDragStart}
+			onDragEnd={handleDragEnd}
+		>
+			{children}
+			<DragOverlay>
+				{activeRole ? (
+					<div className={styles.projectList}>
+						<div className={styles[activeRole.project.status]}>
+							<Project role={activeRole} />
+						</div>
+					</div>
+				) : null}
+			</DragOverlay>
+		</DndContext>
+	);
 }
