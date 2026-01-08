@@ -8,76 +8,79 @@ import { FormEvent, useEffect, useState } from "react";
 import { ClientStream, createClientStream } from "streamthing";
 
 interface PropsType {
-  email: string;
+    email: string;
 }
 
 export default function CheckEmail({ email }: PropsType) {
-  const router = useRouter();
-  const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isManualLogin, setIsManualLogin] = useState(false);
+    const router = useRouter();
+    const [code, setCode] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [isManualLogin, setIsManualLogin] = useState(false);
 
-  useEffect(() => {
-    let stream: ClientStream;
+    useEffect(() => {
+        let stream: ClientStream;
 
-    getWebsocketToken().then((token) => {
-      stream = createClientStream({
-        id: env.NEXT_PUBLIC_WEBSOCKET_SERVER_ID,
-        region: env.NEXT_PUBLIC_WEBSOCKET_SERVER_REGION,
-        token,
-      });
+        getWebsocketToken().then((token) => {
+            stream = createClientStream({
+                id: env.NEXT_PUBLIC_WEBSOCKET_SERVER_ID,
+                region: env.NEXT_PUBLIC_WEBSOCKET_SERVER_REGION,
+                token,
+            });
 
-      stream.receive("login", () => window.location.replace("/onboarding"));
-    });
-    return () => stream?.disconnect();
-  }, [email]);
-
-  function formSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (loading) return;
-
-    setLoading(true);
-    promiseToast(
-      new Promise((resolve, reject) => {
-        loginWithOTP(Number(code)).then((res) => {
-          if (res.success) resolve(res);
-          else reject(res);
+            stream.receive("login", () =>
+                window.location.replace("/onboarding")
+            );
         });
-      }),
-      {
-        successFunction: () => router.push("/onboarding"),
-        errorFunction: () => setLoading(false),
-      }
-    );
-  }
+        return () => stream?.disconnect();
+    }, []);
 
-  return (
-    <div id={styles.checkEmail}>
-      <p>
-        We&apos;ve sent you a temporary login link.
-        <br /> Please check your inbox at <span>{email}</span>.
-      </p>
-      {isManualLogin ? (
-        <form onSubmit={formSubmit} id={styles.codeLogin}>
-          <input
-            value={code}
-            autoFocus
-            maxLength={6}
-            onChange={(e) =>
-              /^\d+$/.test(e.target.value) && setCode(e.target.value)
+    function formSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        if (loading) return;
+
+        setLoading(true);
+        promiseToast(
+            new Promise((resolve, reject) => {
+                loginWithOTP(Number(code)).then((res) => {
+                    if (res.success) resolve(res);
+                    else reject(res);
+                });
+            }),
+            {
+                successFunction: () => router.push("/onboarding"),
+                errorFunction: () => setLoading(false),
             }
-            type="text"
-            placeholder="Enter code"
-          />
-          <button disabled={loading} type="submit">
-            Continue with login code
-          </button>
-        </form>
-      ) : (
-        <button onClick={() => setIsManualLogin(true)}>
-          Enter code manually
-        </button>
-      )}
-    </div>
-  );
+        );
+    }
+
+    return (
+        <div id={styles.checkEmail}>
+            <p>
+                We&apos;ve sent you a temporary login link.
+                <br /> Please check your inbox at <span>{email}</span>.
+            </p>
+            {isManualLogin ? (
+                <form onSubmit={formSubmit} id={styles.codeLogin}>
+                    <input
+                        value={code}
+                        autoFocus
+                        maxLength={6}
+                        onChange={(e) =>
+                            /^\d+$/.test(e.target.value) &&
+                            setCode(e.target.value)
+                        }
+                        type="text"
+                        placeholder="Enter code"
+                    />
+                    <button disabled={loading} type="submit">
+                        Continue with login code
+                    </button>
+                </form>
+            ) : (
+                <button onClick={() => setIsManualLogin(true)}>
+                    Enter code manually
+                </button>
+            )}
+        </div>
+    );
 }
